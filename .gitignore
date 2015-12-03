@@ -1,0 +1,4 @@
+/pkg/
+/spec/fixtures/
+.yardopts
+.yardoc/

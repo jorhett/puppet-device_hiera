@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.7.6
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!file.README.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="puppet_manifest_list_link"
+        href="puppet_manifest_list.html">
+      Puppet Manifest List
+    </a>
+  
+    <a class="full_list_link" id="puppet_plugin_list_link"
+        href="puppet_plugin_list.html">
+      Puppet Plugin List
+    </a>
+  
+    <a class="full_list_link" id="puppet_type_list_link"
+        href="puppet_type_list.html">
+      Puppet Type List
+    </a>
+  
+    <a class="full_list_link" id="puppet_provider_list_link"
+        href="puppet_provider_list.html">
+      Puppet Provider List
+    </a>
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'>
+<h1 id="label-device_hiera">device_hiera</h1>
+
+<h4 id="label-Table+of+Contents">Table of Contents</h4>
+<ol><li>
+<p><a href="#overview">Overview</a></p>
+</li><li>
+<p><a href="#module-description">Module Description - What the module does and
+why it is useful</a></p>
+</li><li>
+<p><a href="#setup">Setup - The basics of getting started with
+device_hiera</a></p>
+<ul><li>
+<p><a href="#what-device_hiera-affects">What device_hiera affects</a></p>
+</li><li>
+<p><a href="#setup-requirements">Setup requirements</a></p>
+</li><li>
+<p><a href="#beginning-with-device_hiera">Beginning with device_hiera</a></p>
+</li></ul>
+</li><li>
+<p><a href="#usage">Usage - Configuration options and additional
+functionality</a></p>
+</li><li>
+<p><a href="#reference">Reference - An under-the-hood peek at what the module
+is doing and how</a></p>
+</li><li>
+<p><a href="#limitations">Limitations - OS compatibility, etc.</a></p>
+</li><li>
+<p><a href="#development">Development - Guide for contributing to the
+module</a></p>
+</li></ol>
+
+<h2 id="label-Overview">Overview</h2>
+
+<p>Utilize Hiera data and default port configurations to simplify network
+device (e.g. Cisco, Juniper, Arista, etc) configuration.</p>
+
+<h2 id="label-Module+Description">Module Description</h2>
+
+<p>Device Hiera makes uses of Hiera data and Hiera hierarchies to provide
+complete network device configurations with a DRY and minimal data input
+format. This module does no implementation, it simply creates appropriate
+device-specific resources from the data provided.</p>
+
+<h2 id="label-Setup">Setup</h2>
+
+<h3 id="label-What+device_hiera+affects">What device_hiera affects</h3>
+<ul><li>
+<p>Uses Hiera hierarchy and data merging to simplify multiple device
+configuration</p>
+</li><li>
+<p>Allows definition of port defaults which reduces repetitive data entry
+(DRY)</p>
+</li><li>
+<p>Can be used with any network device vendor</p>
+</li></ul>
+
+<h3 id="label-Setup+Requirements">Setup Requirements</h3>
+
+<p>Define Hiera data as documented in the modules.</p>
+
+<h2 id="label-Usage">Usage</h2>
+
+<p>Include the appropriate classes for the device resources you wish to
+manage.</p>
+<ul><li>
+<p><code>device_hiera::interfaces</code> to manage network ports</p>
+</li><li>
+<p><code>device_hiera::vlans</code> to manage vlans</p>
+</li></ul>
+
+<p>…etc</p>
+
+<h2 id="label-Limitations">Limitations</h2>
+
+<p>You will need to include any vendor-specific modules necessary to implement
+the resources created by device_hiera.</p>
+
+<h2 id="label-Development">Development</h2>
+
+<p>Any and all patches or features welcome and encouraged.</p>
+</div></div>
+
+    <div id="footer">
+  Generated on Thu Dec  3 05:13:05 2015 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.1.7).
+</div>
+
+  </body>
+</html>

@@ -25,5 +25,6 @@
 class device_hiera {
 
   contain device_hiera::interfaces
+  contain device_hiera::vlans
 
 }

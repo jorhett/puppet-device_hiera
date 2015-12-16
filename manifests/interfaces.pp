@@ -38,8 +38,8 @@
 #    mode: 'dynamic auto'
 # 
 #  device_hiera::interfaces::ports:
-#    'FastEthernet0': '1-24'
-#    'GigabitEthernet0': '1-2'
+#    - 'FastEthernet0': '1-24'
+#    - 'GigabitEthernet0': '1-2'
 # 
 #  device_hiera::interfaces::custom:
 #    'GigabitEthernet0/3':
@@ -52,12 +52,23 @@ class device_hiera::interfaces {
   $ports = hiera_array( 'device_hiera::interfaces::ports', {} )
   $custom = hiera_hash( 'device_hiera::interfaces::custom', {} )
 
+  # avoid messy vlan settings irrelevant to the port
+  if $defaults['mode'] == 'access' {
+    $clean_defaults = delete( $defaults, ['native_vlan','encapsulation'] )
+  }
+  elsif $defaults['mode'] == 'trunk' {
+    $clean_defaults = delete( $defaults, 'access_vlan' )
+  }
+  else {
+    $clean_defaults = $defaults
+  }
+
+  # First process all default port configs
   $ports.each() |$slot| {
     $slot.each() |$prefix,$ports| {
       $range = $ports.scanf('%i-%i') |$values| {
         $min = $values[0]
         $max = $values[1]
-        notice( $min, $max )
         unless $min > 0 {
           fail "Invalid port range #{ports}"
           [-1,-1]
@@ -68,19 +79,35 @@ class device_hiera::interfaces {
         }
         [$min,$max]
       }
-      notice( "port range: $prefix/${range[0]} - $prefix/${range[1]}" )
 
       Integer[ $range[0], $range[1] ].each |$portnum| {
         $intname = "${prefix}/${portnum}"
         # If we don't have a specific, give it default config
         if $custom[$intname] == undef {
-          $reshash = { $intname => $defaults, }
-          notice( $reshash )
+          $reshash = { $intname => $clean_defaults, }
           create_resources( interface, $reshash )
         }
       }
     }
   }
 
-  create_resources( interface, $custom, $defaults )
+  # Now process all customized port configs
+  $custom_interfaces = $custom.each() |$interface,$intconfig| {
+    # avoid messy vlan settings irrelevant to the port
+    if( $intconfig['mode'] == undef and $defaults['mode'] == 'access' ) or ($intconfig['mode'] == 'access' ) {
+      $finalconfig = delete( $intconfig, ['native_vlan','encapsulation'] )
+      $clean_defaults = delete( $defaults, ['native_vlan','encapsulation'] )
+    }
+    elsif( $intconfig['mode'] == undef and $defaults['mode'] == 'trunk' ) or ($intconfig['mode'] == 'trunk' ) {
+      $finalconfig = delete( $intconfig, ['access_vlan'] )
+      $clean_defaults = delete( $defaults, ['access_vlan'] )
+    }
+    else {
+      $finalconfig = $intconfig
+      $clean_defaults = $defaults
+    }
+    # Now create the resource
+    $reshash = { $interface => $finalconfig, }
+    create_resources( interface, $reshash, $clean_defaults )
+  }
 }

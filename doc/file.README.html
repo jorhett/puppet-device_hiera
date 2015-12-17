@@ -110,17 +110,129 @@ module</a></p>
 
 <h2 id="label-Overview">Overview</h2>
 
-<p>Utilize Hiera data and default port configurations to simplify network
-device (e.g. Cisco, Juniper, Arista, etc) configuration.</p>
+<p>TL;DR - DRY network device configuration</p>
+
+<p>Network device configuration (e.g. Cisco, Juniper, Arista, etc) using
+individual resources is messy and repetitive. This module takes advantage
+of Hiera hierarchies and hash merging to simplify and centralize network
+device configuration.</p>
+
+<p>This module can reduce the configuration of a distribution campus switch
+environment from thousands of lines to a few dozen.</p>
 
 <h2 id="label-Module+Description">Module Description</h2>
 
 <p>Device Hiera makes uses of Hiera data and Hiera hierarchies to provide
 complete network device configurations with a DRY and minimal data input
-format. This module does no implementation, it simply creates appropriate
-device-specific resources from the data provided.</p>
+format. This module does no implementation, it simply utilizes Hiera&#39;s
+hash merging capabilities to creates the appropriate device-specific
+resources.</p>
 
 <h2 id="label-Setup">Setup</h2>
+
+<p>No setup required other than</p>
+<ul><li>
+<p>define the Hiera data for each type as documented</p>
+</li><li>
+<p>ensure that you&#39;ve installed modules which provide the device resource
+you want  (e.g. anything other than <code>vlan</code> and
+<code>interface</code>)</p>
+</li></ul>
+
+<h3 id="label-Setup+Requirements">Setup Requirements</h3>
+
+<p>Define Hiera data as documented here or in the module examples.</p>
+
+<h2 id="label-Usage">Usage</h2>
+
+<p>List the resource types you wish to load from Hiera data.</p>
+<ul><li>
+<p><code>interfaces</code> to provide slots and port ranges (notice plural)</p>
+</li><li>
+<p><code>vlan</code> to manage vlans</p>
+</li><li>
+<p>…any other type provided by modules you have installed</p>
+</li></ul>
+
+<p>Declare the base class, and list the resource types which should be used
+from Hiera.</p>
+
+<pre class="code ruby"><code class="ruby">classes:
+  - device_hiera
+
+device_hiera::resources:
+  - vlan
+  - interfaces</code></pre>
+
+<p>For each resource type you can define defaults which will be used if not
+overridden in the specific definition. For example, interface definition:</p>
+
+<pre class="code ruby"><code class="ruby">device_hiera::defaults::interface:
+  description  : &#39;Default interface configuration&#39;
+  mode         : &#39;dynamic auto&#39;
+  encapsulation: &#39;negotiate&#39;
+  access_vlan  : &#39;200&#39;</code></pre>
+
+<p>Interfaces are special because we provide the ability to list slots in the
+chassis along with a list of ports, which obviously the interface parameter
+doesn&#39;t handle.</p>
+
+<p>First define an array which contains a single key of the slot name, and a
+value containing a single range of ports MIN-MAX. The slot can defined
+multiple times.</p>
+
+<pre class="code ruby"><code class="ruby">device_hiera::interfaces::ports:
+  - &#39;FastEthernet0&#39;     : &#39;2-23&#39;
+  - &#39;GigabitEthernet1/0&#39;: &#39;1-2&#39;
+  - &#39;GigabitEthernet1/0&#39;: &#39;5-6&#39;</code></pre>
+
+<p>Then define the custom parameters for any port with a non-default
+configuration. These ports can fall inside or outside of the slots and
+ranges supplied above.</p>
+
+<pre class="code ruby"><code class="ruby">device_hiera::interfaces::custom:
+  &#39;GigabitEthernet1/0/3&#39;:
+     description  : &#39;Uplink to core&#39;
+     mode         : &#39;trunking&#39;
+     encapsulation: &#39;dot1q&#39;
+     native_vlan  : 200</code></pre>
+
+<p>Any other resource type can also be created with parameters supplied in a
+hash under their title. They can likewise fall back on default values for
+the type.</p>
+
+<p>Values for the resource types and parameters should be taken from the
+module which provides the resource type in question. Documentation for the
+vlan type used below can be found at <a
+href="https://docs.puppetlabs.com/references/latest/type.html#vlan">docs.puppetlabs.com/references/latest/type.html#vlan</a></p>
+
+<pre class="code ruby"><code class="ruby">device_hiera::resources:
+  - vlan
+
+device_hiera::defaults::vlan:
+  ensure: present
+
+device_hiera::vlan:
+  200: 
+    description: &#39;vlan200_Funtime :&#39;
+  400: 
+    description: &#39;vlan400_fail&#39;</code></pre>
+
+<p>For another example, if you have installed the
+<code>puppetlabs/ciscopuppet</code> module, you could use this for OSPF
+configuration:</p>
+
+<pre class="code ruby"><code class="ruby">device_hiera::resources:
+  - cisco_interface_ospf
+
+device_hiera::defaults::cisco_interface_ospf:
+  ensure: present
+  cost  : 200
+  ospf  : default
+
+device_hiera::cisco_interface_ospf:
+  &#39;Ethernet1/2 default&#39;: 
+    area: &#39;172.16.0.0&#39;</code></pre>
 
 <h3 id="label-What+device_hiera+affects">What device_hiera affects</h3>
 <ul><li>
@@ -131,20 +243,6 @@ configuration</p>
 (DRY)</p>
 </li><li>
 <p>Can be used with any network device vendor</p>
-</li></ul>
-
-<h3 id="label-Setup+Requirements">Setup Requirements</h3>
-
-<p>Define Hiera data as documented in the modules.</p>
-
-<h2 id="label-Usage">Usage</h2>
-
-<p>Include the appropriate classes for the device resources you wish to
-manage.</p>
-<ul><li>
-<p><code>device_hiera::interfaces</code> to manage network ports</p>
-</li><li>
-<p><code>device_hiera::vlans</code> to manage vlans</p>
 </li></ul>
 
 <p>…etc</p>
@@ -160,7 +258,7 @@ the resources created by device_hiera.</p>
 </div></div>
 
     <div id="footer">
-  Generated on Wed Dec 16 07:11:15 2015 by
+  Generated on Wed Dec 16 17:00:12 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.1.7).
 </div>

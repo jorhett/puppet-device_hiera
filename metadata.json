@@ -1,8 +1,8 @@
 {
   "name": "jorhett-device_hiera",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "jorhett",
-  "summary": 'Utilize Hiera data and default port configurations to simplify network device configuration."
+  "summary": "Utilize Hiera data and default port configurations to simplify network device configuration.",
   "license": "BSD-3-Clause",
   "source": "https://github.com/jorhett/puppet-device_hiera",
   "project_page": "https://github.com/jorhett/puppet-device_hiera",

@@ -1,4 +1,14 @@
-##2015-12-16 - Release 0.1.1
+##2015-12-16 - Release 0.2.0
+###Summary
+
+Altered configuration to generate any resource type based on Hiera input.
+Define the list of resources using `resources` array parameter
+
+####Features
+
+- Support all resource types with defaults and hash merging
+
+##2015-12-15 - Release 0.1.1
 ###Summary
 
 Added support for VLAN hash merge from Hiera

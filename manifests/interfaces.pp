@@ -31,9 +31,12 @@
 # @example Hiera configuration for device_hiera::interfaces
 #
 #  classes:
-#  - device_hiera::interfaces
+#  - device_hiera
+#  
+#  device_hiera::resources:
+#  - interfaces
 #
-#  device_hiera::interfaces::default:
+#  device_hiera::defaults::interface:
 #    description: 'Default configuration'
 #    mode: 'dynamic auto'
 # 
@@ -48,11 +51,10 @@
 #
 class device_hiera::interfaces {
 
-  $defaults = hiera_hash( 'device_hiera::interfaces::default', {} )
-  $ports = hiera_array( 'device_hiera::interfaces::ports', {} )
-  $custom = hiera_hash( 'device_hiera::interfaces::custom', {} )
+  # Determine the default interface profile
+  $defaults = hiera_hash( 'device_hiera::defaults::interface', {} )
 
-  # avoid messy vlan settings irrelevant to the port
+  # make duplicate profile without unused VLAN settings
   if $defaults['mode'] == 'access' {
     $clean_defaults = delete( $defaults, ['native_vlan','encapsulation'] )
   }
@@ -63,7 +65,11 @@ class device_hiera::interfaces {
     $clean_defaults = $defaults
   }
 
-  # First process all default port configs
+  # Now get a list of ports
+  $ports = hiera_array( 'device_hiera::interfaces::ports', {} )
+  $custom = hiera_hash( 'device_hiera::interfaces::custom', {} )
+
+  # Process every listed port unless it has a custom config
   $ports.each() |$slot| {
     $slot.each() |$prefix,$ports| {
       $range = $ports.scanf('%i-%i') |$values| {
@@ -81,8 +87,8 @@ class device_hiera::interfaces {
       }
 
       Integer[ $range[0], $range[1] ].each |$portnum| {
+        # If the port doesn't have a custom config, give it the default config
         $intname = "${prefix}/${portnum}"
-        # If we don't have a specific, give it default config
         if $custom[$intname] == undef {
           $reshash = { $intname => $clean_defaults, }
           create_resources( interface, $reshash )
@@ -91,23 +97,23 @@ class device_hiera::interfaces {
     }
   }
 
-  # Now process all customized port configs
+  # Crocess all customized port configs
   $custom_interfaces = $custom.each() |$interface,$intconfig| {
     # avoid messy vlan settings irrelevant to the port
     if( $intconfig['mode'] == undef and $defaults['mode'] == 'access' ) or ($intconfig['mode'] == 'access' ) {
-      $finalconfig = delete( $intconfig, ['native_vlan','encapsulation'] )
+      $final_config = delete( $intconfig, ['native_vlan','encapsulation'] )
       $clean_defaults = delete( $defaults, ['native_vlan','encapsulation'] )
     }
     elsif( $intconfig['mode'] == undef and $defaults['mode'] == 'trunk' ) or ($intconfig['mode'] == 'trunk' ) {
-      $finalconfig = delete( $intconfig, ['access_vlan'] )
+      $final_config = delete( $intconfig, ['access_vlan'] )
       $clean_defaults = delete( $defaults, ['access_vlan'] )
     }
     else {
-      $finalconfig = $intconfig
+      $final_config = $intconfig
       $clean_defaults = $defaults
     }
     # Now create the resource
-    $reshash = { $interface => $finalconfig, }
+    $reshash = { $interface => $final_config, }
     create_resources( interface, $reshash, $clean_defaults )
   }
 }

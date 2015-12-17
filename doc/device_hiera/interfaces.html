@@ -136,9 +136,12 @@ configuration settings.</p>
       <div class="inline"><p>Hiera configuration for device_hiera::interfaces</p></div>
       <pre class="example code"><code><span>
 classes:
-- device_hiera::interfaces
+- device_hiera
 
-device_hiera::interfaces::default:
+device_hiera::resources:
+- interfaces
+
+device_hiera::defaults::interface:
   description: 'Default configuration'
   mode: 'dynamic auto'
 
@@ -159,7 +162,7 @@ device_hiera::interfaces::custom:
 </div>
 
     <div id="footer">
-  Generated on Wed Dec 16 07:11:15 2015 by
+  Generated on Wed Dec 16 17:00:12 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.1.7).
 </div>

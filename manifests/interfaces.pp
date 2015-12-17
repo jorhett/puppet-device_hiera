@@ -56,10 +56,10 @@ class device_hiera::interfaces {
 
   # make duplicate profile without unused VLAN settings
   if $defaults['mode'] == 'access' {
-    $clean_defaults = delete( $defaults, ['native_vlan','encapsulation'] )
+    $clean_defaults = $defaults - ['native_vlan','encapsulation']
   }
   elsif $defaults['mode'] == 'trunk' {
-    $clean_defaults = delete( $defaults, 'access_vlan' )
+    $clean_defaults = $defaults - ['access_vlan']
   }
   else {
     $clean_defaults = $defaults
@@ -97,21 +97,24 @@ class device_hiera::interfaces {
     }
   }
 
-  # Crocess all customized port configs
-  $custom_interfaces = $custom.each() |$interface,$intconfig| {
+  # Process all customized port configs
+  $custom.each() |$interface,$intconfig| {
     # avoid messy vlan settings irrelevant to the port
+    notice( "mode = ${intconfig['mode']}" )
     if( $intconfig['mode'] == undef and $defaults['mode'] == 'access' ) or ($intconfig['mode'] == 'access' ) {
-      $final_config = delete( $intconfig, ['native_vlan','encapsulation'] )
-      $clean_defaults = delete( $defaults, ['native_vlan','encapsulation'] )
+      $final_config = $intconfig - ['native_vlan','encapsulation']
+      $clean_defaults = $defaults - ['native_vlan','encapsulation','description']
     }
     elsif( $intconfig['mode'] == undef and $defaults['mode'] == 'trunk' ) or ($intconfig['mode'] == 'trunk' ) {
-      $final_config = delete( $intconfig, ['access_vlan'] )
-      $clean_defaults = delete( $defaults, ['access_vlan'] )
+      $final_config = $intconfig - ['access_vlan']
+      $clean_defaults = $defaults - ['access_vlan','description']
     }
     else {
       $final_config = $intconfig
-      $clean_defaults = $defaults
+      $clean_defaults = $defaults - ['description']
     }
+    notice( "config = ${final_config}" )
+    notice( "defaults = ${clean_defaults}" )
     # Now create the resource
     $reshash = { $interface => $final_config, }
     create_resources( interface, $reshash, $clean_defaults )

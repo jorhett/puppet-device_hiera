@@ -1,3 +1,10 @@
+##2015-12-16 - Release 0.2.1
+###Summary
+####Bugfixes
+
+- Don't pass VLAN parameters which won't be used through 
+- Don't use default description on custom ports
+
 ##2015-12-16 - Release 0.2.0
 ###Summary
 

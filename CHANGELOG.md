@@ -1,9 +1,15 @@
-##2015-12-16 - Release 0.2.1
+##2015-12-16 - Release 0.2.3
 ###Summary
+####Features
+
+- Changed to Apache-2.0 License
+- New 'has_facter' fact, the absence of which reliably identifies "puppet device" invocations
+- New custom resources network_interfaces (for Cisco NX-OS)
+
 ####Bugfixes
 
-- Don't pass VLAN parameters which won't be used through 
 - Don't use default description on custom ports
+- (for Cisco) Don't pass in VLAN parameters which won't be used
 
 ##2015-12-16 - Release 0.2.0
 ###Summary

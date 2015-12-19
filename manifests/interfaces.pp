@@ -100,7 +100,6 @@ class device_hiera::interfaces {
   # Process all customized port configs
   $custom.each() |$interface,$intconfig| {
     # avoid messy vlan settings irrelevant to the port
-    notice( "mode = ${intconfig['mode']}" )
     if( $intconfig['mode'] == undef and $defaults['mode'] == 'access' ) or ($intconfig['mode'] == 'access' ) {
       $final_config = $intconfig - ['native_vlan','encapsulation']
       $clean_defaults = $defaults - ['native_vlan','encapsulation','description']
@@ -113,8 +112,6 @@ class device_hiera::interfaces {
       $final_config = $intconfig
       $clean_defaults = $defaults - ['description']
     }
-    notice( "config = ${final_config}" )
-    notice( "defaults = ${clean_defaults}" )
     # Now create the resource
     $reshash = { $interface => $final_config, }
     create_resources( interface, $reshash, $clean_defaults )

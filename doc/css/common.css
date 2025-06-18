@@ -1,1 +1,8 @@
-/* Override this file with custom rules */
+/* Ensure the search bar doesn't overlap with links */
+.fixed_header {
+  padding-bottom: 25px;
+}
+
+#full_list {
+  padding-top: 15px;
+}
